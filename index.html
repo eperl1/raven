@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>The Raven – Ordered Presentation + 3D Finale</title>
+<style>
+  :root{--accent:#e75867;}
+  html,body{
+    margin:0; height:100%; background:#000; color:#f0f0f0;
+    font-family:'Georgia', 'Times New Roman', serif; overflow:hidden;
+  }
+  .intro{
+    position:relative; display:flex; flex-direction:column; align-items:center;
+    height:100%; opacity:1; transition:opacity 1.5s ease-in-out;
+  }
+  h1{
+    margin:24px 0 10px; font-size:2.6rem; color:var(--accent);
+    text-shadow:0 2px 10px #000; user-select:none;
+  }
+  .iframe-wrap{
+    flex:1; display:flex; align-items:center; justify-content:center; width:100%;
+  }
+  iframe{
+    width:1200px; height:800px; max-width:98vw; max-height:75vh;
+    border:1px solid #222; background:#0a0a0a;
+  }
+  .intro p{
+    margin:10px 0 22px; color:#aaa; font-size:1.1rem; user-select:none; text-align:center;
+  }
+  .start-now{
+    position:fixed; bottom:16px; right:16px; padding:10px 14px;
+    background:#141417; border:1px solid #333; color:#eee; border-radius:8px;
+    cursor:pointer; opacity:.85; font-family:system-ui, sans-serif;
+  }
+  .start-now:hover{opacity:1;}
+  .deck{
+    position:fixed; inset:0; display:none; opacity:0; transition:opacity 2s ease-in-out;
+  }
+  .deck.active{display:block; opacity:1;}
+  .scene{
+    position:absolute; inset:0; opacity:0; transition:opacity 2s ease-in-out;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; background-size:cover; background-position:center;
+  }
+  .scene.active{opacity:1;}
+  #sorrow{background-image:url(/images/sorrow-bg.jpg);}
+  #fear{background-image:url(/images/fear-bg.jpg);}
+  #amusement{background-image:url(/images/amusement-bg.jpg);}
+  #irritation{background-image:url(/images/irritation-bg.jpg);}
+  #desperation{background-image:url(/images/desperation-bg.jpg);}
+  #despair{background-image:url(/images/despair-bg.jpg);}
+  #acceptance{background-image:url(/images/acceptance-bg.jpg);}
+
+  .inner{
+    position:relative; max-width:900px; padding:24px; color:#ddd; text-shadow:1px 1px 5px #000;
+  }
+  .title{
+    font-size:3.5rem; margin:0 0 20px; color:var(--accent);
+    text-shadow:0 3px 16px #000;
+  }
+  .quote{
+    font-size:1.6rem; line-height:1.5; background:rgba(0,0,0,.6);
+    padding:20px; border-left:4px solid var(--accent);
+    border-radius:5px; box-shadow:0 0 20px rgba(0,0,0,0.5);
+    margin-bottom:20px; font-style:italic;
+  }
+  .explanation{
+    font-size:1.1rem; line-height:1.6; max-width:800px; margin:0 auto 2rem;
+  }
+  /* Animations */
+  @keyframes heartbeat {0%, 100% {transform:scale(1);} 50% {transform:scale(1.03);}}
+  #fear.active .inner {animation: heartbeat 1.2s ease-in-out infinite;}
+  @keyframes tremor{
+    0%,100%{transform:translate(0,0)}
+    20%{transform:translate(-1px,1px)}
+    40%{transform:translate(1px,-1px)}
+    60%{transform:translate(-1px,-1px)}
+    80%{transform:translate(1px,1px)}
+  }
+  #irritation.active .inner{animation:tremor 800ms linear infinite;}
+  .lightning{
+    position:absolute; inset:0; background:#fff; mix-blend-mode:screen;
+    opacity:0; z-index:1; animation:flash 8s linear infinite 1.5s;
+  }
+  @keyframes flash{
+    0%,92%{opacity:0;}
+    93%{opacity:.8;}
+    94%{opacity:0;}
+    96%{opacity:.6;}
+    100%{opacity:0;}
+  }
+  @keyframes closeIn{
+    0%{transform:scale(1.2);}
+    100%{transform:scale(1);}
+  }
+  #despair:before{
+    content:""; position:absolute; inset:-20%;
+    background:radial-gradient(ellipse,transparent 40%,#000 75%);
+    animation:closeIn 12s ease-out forwards;
+  }
+  .fade-to-black{
+    position:fixed; inset:0; background:#000; opacity:0;
+    transition:opacity 3s ease-in-out; z-index:99; pointer-events:none;
+  }
+  /* Raven & Nevermore */
+  .raven-wrap{position:fixed; inset:0; pointer-events:none; z-index:9;}
+  svg.raven{
+    position:absolute; width:220px; height:auto;
+    left:-40vw; top:20vh; opacity:0;
+  }
+  @keyframes fly {
+    0%{transform:translate(-60vw,0) scale(.9) rotate(-6deg);opacity:0;}
+    15%{opacity:1;}
+    50%{transform:translate(0,-8vh) scale(1) rotate(4deg);opacity:1;}
+    100%{transform:translate(70vw,-2vh) scale(.95) rotate(-2deg);opacity:0;}
+  }
+  svg.raven.animate{animation:fly 2.4s ease-in-out forwards;}
+  .nevermore{
+    position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
+    font-size:10rem; font-weight:700; color:var(--accent);
+    text-shadow:0 0 30px #000; opacity:0; z-index:10; pointer-events:none;
+  }
+  @keyframes popFade {
+    0%{opacity:0; transform:scale(.6);}
+    20%{opacity:1; transform:scale(1.06);}
+    80%{opacity:1; transform:scale(1);}
+    100%{opacity:0; transform:scale(1.5);}
+  }
+  .nevermore.show {
+    animation: popFade 2s ease-in-out forwards;
+  }
+  .hide {
+    display:none;
+  }
+</style>
+
+<body>
+
+<div id="audio-bin" class="hide">
+  <audio id="ambience-sorrow" src="/sounds/ambience-sorrow.m4a" loop preload="auto"></audio>
+  <audio id="ambience-fear" src="/sounds/ambience-fear.m4a" loop preload="auto"></audio>
+  <audio id="ambience-amusement" src="/sounds/ambience-amusement.m4a" loop preload="auto"></audio>
+  <audio id="ambience-irritation" src="/sounds/ambience-irritation.m4a" loop preload="auto"></audio>
+  <audio id="ambience-desperation" src="/sounds/ambience-desperation.m4a" loop preload="auto"></audio>
+  <audio id="ambience-despair" src="/sounds/ambience-despair.m4a" loop preload="auto"></audio>
+  <audio id="ambience-acceptance" src="/sounds/ambience-acceptance.m4a" loop preload="auto"></audio>
+  <audio id="sound-knocking" src="/sounds/sound-knocking.m4a" preload="auto"></audio>
+  <audio id="sound-thunder" src="/sounds/sound-thunder.m4a" preload="auto"></audio>
+  <audio id="sound-raven" src="/sounds/sound-raven.m4a" preload="auto"></audio>
+</div>
+
+<div class="intro" id="intro">
+  <h1>The Raven</h1>
+  <div class="iframe-wrap">
+    <iframe id="trinket" src="https://trinket.io/embed/python/da5a3ff5ed28?outputOnly=true" allowfullscreen></iframe>
+  </div>
+  <p>The presentation will begin automatically. Or, start it now.</p>
+  <button class="start-now" id="startNow">Start Cinematic Experience</button>
+</div>
+
+<div class="deck" id="deck">
+  <section class="scene" id="sorrow">
+    <div class="inner">
+      <h2 class="title">Sorrow</h2>
+      <div class="quote">"Vainly I had sought to borrow from my books surcease of sorrow—sorrow for the lost Lenore."</div>
+      <p class="explanation">Opening the door to find only darkness, the narrator's brief fear gives way again to his profound grief. The dim, rainy atmosphere reflects his isolation and deep sadness as he fails to find any distraction from the pain of losing Lenore.</p>
+    </div>
+  </section>
+  <section class="scene" id="fear">
+    <div class="inner">
+      <h2 class="title">Fear</h2>
+      <div class="quote">"And the silken, sad, uncertain rustling of each purple curtain thrilled me—filled me with fantastic terrors never felt before;"</div>
+      <p class="explanation">Before the raven appears, a mysterious knock at the door fills the narrator with a sudden, irrational fear. The pulsing heartbeat and view of the closed door reflect his anxiety and suspense, wondering who—or what—could be there at this late hour.</p>
+    </div>
+  </section>
+  <section class="scene" id="amusement">
+    <div class="inner">
+      <h2 class="title">Amusement</h2>
+      <div class="quote">"Then this ebony bird beguiling my sad fancy into smiling, by the grave and stern decorum of the countenance it wore."</div>
+      <p class="explanation">The sudden arrival of the raven offers a strange distraction. The narrator is initially entertained by the bird's serious appearance, which briefly pulls him out of his grief. This fleeting moment of curiosity is represented by the warm, fire-lit room.</p>
+    </div>
+  </section>
+  <section class="scene" id="irritation">
+    <div class="inner">
+      <h2 class="title">Irritation</h2>
+      <div class="quote">"What this grim, ungainly, ghastly, gaunt, and ominous bird of yore meant in croaking 'Nevermore'."</div>
+      <p class="explanation">Amusement sours into annoyance as the raven answers every question with the same word. The narrator’s mind begins to race, trying to understand the meaning behind the "ominous" repetition. The tense, jarring visuals and sounds mirror his growing agitation.</p>
+    </div>
+  </section>
+  <section class="scene" id="desperation">
+    <div class="lightning"></div>
+    <div class="inner">
+      <h2 class="title">Desperation</h2>
+      <div class="quote">"'Prophet!' said I, 'thing of evil!—prophet still, if bird or devil!—Is there—is there balm in Gilead?—tell me, I implore!'"</div>
+      <p class="explanation">The narrator now sees the raven as a supernatural messenger. He desperately begs it for any sign of hope, asking if he will ever find peace or see Lenore in heaven. The raging thunderstorm reflects his own internal torment and frantic search for answers.</p>
+    </div>
+  </section>
+  <section class="scene" id="despair">
+    <div class="inner">
+      <h2 class="title">Despair</h2>
+      <div class="quote">"Take thy beak from out my heart, and take thy form from off my door!' Quoth the Raven 'Nevermore'."</div>
+      <p class="explanation">When the raven confirms he will never again see Lenore, the narrator shatters. He accepts "Nevermore" as his final doom. This shriek of anguish marks his complete surrender to hopelessness as the last light of hope is extinguished.</p>
+    </div>
+  </section>
+  <section class="scene" id="acceptance">
+    <div class="inner">
+      <h2 class="title">Acceptance</h2>
+      <div class="quote">"And my soul from out that shadow that lies floating on the floor shall be lifted—nevermore!"</div>
+      <p class="explanation">The storm has passed, both outside and within. All that remains is the chilling, permanent shadow of the raven, symbolizing the narrator's soul now trapped in eternal despair. He doesn't fight anymore; he has accepted his fate.</p>
+    </div>
+  </section>
+</div>
+
+<div class="raven-wrap" aria-hidden="true">
+  <svg class="raven" id="raven" viewBox="0 0 260 160"><g><path fill="#0a0a0a" d="M120,70 C90,40 70,30 55,25 C85,55 95,85 125,100 Z"/><path fill="#0a0a0a" d="M60,100 C40,80 20,70 10,60 C35,85 45,115 70,130 Z"/><ellipse fill="#0a0a0a" cx="140" cy="110" rx="80" ry="55"/><path fill="#0a0a0a" d="M80,135 L40,160 L85,150 Z"/><circle fill="#0a0a0a" cx="205" cy="85" r="24"/><path fill="#0a0a0a" d="M220,83 L260,75 L220,92 Z"/><circle fill="#c83c3c" cx="212" cy="80" r="3"/></g></svg>
+</div>
+<div class="nevermore" id="nevermore">NEVERMORE</div>
+<div class="fade-to-black" id="fadeToBlack"></div>
+
+<div id="threejs-overlay" style="position: fixed; inset: 0; pointer-events: none; z-index: 110;"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/loaders/GLTFLoader.js"></script>
+
+<script>
+  // Robust sound fade helper
+  const fadeTimers = new Map();
+
+  function fadeAudio(sound, targetVolume, duration) {
+    if (!sound) return Promise.resolve();
+    if (fadeTimers.has(sound)) clearInterval(fadeTimers.get(sound));
+    const stepCount = 30;
+    const stepTime = duration / stepCount;
+    let currentStep = 0;
+    const initialVolume = sound.volume;
+    const volumeStep = (targetVolume - initialVolume) / stepCount;
+
+    return new Promise(resolve => {
+      const timer = setInterval(() => {
+        currentStep++;
+        const newVol = initialVolume + volumeStep * currentStep;
+        sound.volume = Math.min(Math.max(newVol, 0), 1);
+        if (currentStep >= stepCount) {
+          clearInterval(timer);
+          fadeTimers.delete(sound);
+          if (targetVolume === 0) {
+            sound.pause();
+            sound.currentTime = 0;
+          }
+          resolve();
+        }
+      }, stepTime);
+      fadeTimers.set(sound, timer);
+    });
+  }
+
+  async function playSound(sound, volume = 0.7) {
+    if (!sound) return;
+    try {
+      if (sound.paused) {
+        sound.volume = 0;
+        await sound.play();
+      }
+      await fadeAudio(sound, volume, 3000);
+    } catch (e) {
+      // Ignore audio unlock errors
+    }
+  }
+
+  async function stopAllSounds(exceptSound = null) {
+    const promises = [];
+    for (const key in sounds) {
+      const s = sounds[key];
+      if (s !== exceptSound) {
+        promises.push(fadeAudio(s, 0, 2000));
+      }
+    }
+    await Promise.all(promises);
+  }
+
+  function cueNevermore() {
+    dom.raven.classList.remove("animate");
+    void dom.raven.offsetWidth;
+    dom.raven.style.top = (15 + Math.random() * 40) + "vh";
+    dom.raven.classList.add("animate");
+    sounds.raven.currentTime = 0;
+    sounds.raven.play().catch(() => {});
+    dom.nevermore.classList.remove("show");
+    void dom.nevermore.offsetWidth;
+    dom.nevermore.classList.add("show");
+  }
+
+  async function activateScene(sceneId) {
+    document.querySelectorAll(".scene").forEach(s => s.classList.remove("active"));
+    document.getElementById(sceneId).classList.add("active");
+    await stopAllSounds(sounds[sceneId]);
+    await playSound(sounds[sceneId]);
+
+    switch (sceneId) {
+      case "fear":
+        setTimeout(() => { sounds.knocking.currentTime = 0; sounds.knocking.play().catch(() => {}); }, 2000);
+        setTimeout(() => { sounds.knocking.currentTime = 0; sounds.knocking.play().catch(() => {}); }, 5000);
+        break;
+      case "irritation":
+        setTimeout(cueNevermore, 5000);
+        break;
+      case "desperation":
+        setTimeout(() => { sounds.thunder.currentTime = 0; sounds.thunder.play().catch(() => {}); }, 1500);
+        setTimeout(cueNevermore, 7000);
+        break;
+      case "despair":
+        setTimeout(cueNevermore, 6000);
+        break;
+      case "acceptance":
+        setTimeout(cueNevermore, 7000);
+        break;
+    }
+  }
+
+  let config = {
+    autoStartAfterMs: 20000,
+    sceneOrder: [
+      "sorrow",
+      "fear",
+      "amusement",
+      "irritation",
+      "desperation",
+      "despair",
+      "acceptance",
+    ],
+    sceneDurationMs: 14000,
+  };
+  const dom = {
+    intro: document.getElementById("intro"),
+    deck: document.getElementById("deck"),
+    startBtn: document.getElementById("startNow"),
+    raven: document.getElementById("raven"),
+    nevermore: document.getElementById("nevermore"),
+    fadeToBlack: document.getElementById("fadeToBlack"),
+  };
+  const sounds = {
+    sorrow: document.getElementById("ambience-sorrow"),
+    fear: document.getElementById("ambience-fear"),
+    amusement: document.getElementById("ambience-amusement"),
+    irritation: document.getElementById("ambience-irritation"),
+    desperation: document.getElementById("ambience-desperation"),
+    despair: document.getElementById("ambience-despair"),
+    acceptance: document.getElementById("ambience-acceptance"),
+    knocking: document.getElementById("sound-knocking"),
+    thunder: document.getElementById("sound-thunder"),
+    raven: document.getElementById("sound-raven"),
+  };
+  let presentationRunning = false;
+  let sceneTimer = null;
+
+  function runDeck() {
+    if (presentationRunning) return;
+    presentationRunning = true;
+    let sceneIndex = 0;
+    dom.deck.classList.add("active");
+    activateScene(config.sceneOrder[sceneIndex]);
+    sceneTimer = setInterval(() => {
+      sceneIndex++;
+      if (sceneIndex >= config.sceneOrder.length) {
+        clearInterval(sceneTimer);
+        setTimeout(() => {
+          dom.fadeToBlack.style.opacity = 1;
+          stopAllSounds();
+        }, config.sceneDurationMs - 3000);
+        return;
+      }
+      activateScene(config.sceneOrder[sceneIndex]);
+    }, config.sceneDurationMs);
+  }
+
+  async function begin() {
+    if (presentationRunning) return;
+    Object.values(sounds).forEach((s) => {
+      s.volume = 0;
+      s
+        .play()
+        .then(() => s.pause())
+        .catch(() => {});
+    });
+    setTimeout(() => {
+      Object.values(sounds).forEach((s) => {
+        s.pause();
+        s.volume = 1;
+      });
+    }, 100);
+    dom.intro.style.opacity = "0";
+    setTimeout(() => {
+      dom.intro.classList.add("hide");
+      runDeck();
+    }, 1600);
+  }
+
+  let autoStartTimer;
+  document.addEventListener("DOMContentLoaded", () => {
+    autoStartTimer = setTimeout(begin, config.autoStartAfterMs);
+    dom.startBtn.addEventListener("click", () => {
+      clearTimeout(autoStartTimer);
+      begin();
+    });
+    document.body.addEventListener(
+      "click",
+      () => {
+        Object.values(sounds).forEach((s) => {
+          s.volume = 0;
+          s.play().then(() => s.pause()).catch(() => {});
+        });
+      },
+      { once: true }
+    );
+  });
+
+  // THREE.JS 3D Final Animation
+
+  const container = document.getElementById("threejs-overlay");
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(
+    45,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    1000
+  );
+  camera.position.set(0, 2, 5);
+
+  const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  container.appendChild(renderer.domElement);
+
+  const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444);
+  hemiLight.position.set(0, 20, 0);
+  scene.add(hemiLight);
+
+  const dirLight = new THREE.DirectionalLight(0xffffff);
+  dirLight.position.set(-3, 10, -10);
+  scene.add(dirLight);
+
+  const loader = new THREE.GLTFLoader();
+
+  let miniPekka, hogrider;
+  let mixerMiniPekka, mixerHogrider;
+  let clock = new THREE.Clock();
+
+  let miniPekkaLoaded = false,
+    hogriderLoaded = false;
+
+  loader.load("/models/MINIPEKKA.glb", function (gltf) {
+    miniPekka = gltf.scene;
+    miniPekka.position.set(-5, 0, 0);
+    scene.add(miniPekka);
+
+    mixerMiniPekka = new THREE.AnimationMixer(miniPekka);
+    if (gltf.animations.length > 0) {
+      const action = mixerMiniPekka.clipAction(gltf.animations[0]);
+      action.play();
+    }
+
+    miniPekkaLoaded = true;
+    if (hogriderLoaded) start3DSequence();
+  });
+
+  loader.load("/models/HogRider.glb", function (gltf) {
+    hogrider = gltf.scene;
+    hogrider.position.set(20, 0, 0);
+    scene.add(hogrider);
+
+    mixerHogrider = new THREE.AnimationMixer(hogrider);
+    if (gltf.animations.length > 0) {
+      const action = mixerHogrider.clipAction(gltf.animations[0]);
+      action.play();
+    }
+
+    hogriderLoaded = true;
+    if (miniPekkaLoaded) start3DSequence();
+  });
+
+  function lerp(a, b, t) {
+    return a + (b - a) * t;
+  }
+
+  let sequenceStarted = false;
+  function start3DSequence() {
+    if (sequenceStarted) return;
+    sequenceStarted = true;
+
+    const runDuration = 3000,
+      pauseDuration = 1500,
+      hogriderRunDuration = 3000,
+      landDuration = 1400,
+      rideOutDuration = 4000;
+    let startTime = performance.now();
+
+    function animateSequence() {
+      let now = performance.now(),
+        elapsed = now - startTime;
+      if (elapsed < runDuration) {
+        miniPekka.position.x = lerp(-5, 0, elapsed / runDuration);
+      } else if (elapsed < runDuration + pauseDuration) {
+        // Pause briefly - can add more animation here
+      } else if (elapsed < runDuration + pauseDuration + hogriderRunDuration) {
+        let t = (elapsed - runDuration - pauseDuration) / hogriderRunDuration;
+        hogrider.position.x = lerp(20, 0.3, t);
+      } else if (
+        elapsed <
+        runDuration + pauseDuration + hogriderRunDuration + landDuration
+      ) {
+        let t =
+          (elapsed - runDuration - pauseDuration - hogriderRunDuration) / landDuration;
+        miniPekka.position.x = lerp(0, 0.3, t);
+        miniPekka.position.y = lerp(0, 1.2, t);
+      } else if (
+        elapsed <
+        runDuration + pauseDuration + hogriderRunDuration + landDuration + rideOutDuration
+      ) {
+        let t =
+          (elapsed -
+            runDuration -
+            pauseDuration -
+            hogriderRunDuration -
+            landDuration) /
+          rideOutDuration;
+        const startX = 0.3,
+          endX = 20;
+        miniPekka.position.x = lerp(startX, endX, t);
+        hogrider.position.x = lerp(startX, endX, t);
+      } else {
+        return;
+      }
+      requestAnimationFrame(animateSequence);
+    }
+    animateSequence();
+  }
+
+  function animate() {
+    requestAnimationFrame(animate);
+    let delta = clock.getDelta();
+    if (mixerMiniPekka) mixerMiniPekka.update(delta);
+    if (mixerHogrider) mixerHogrider.update(delta);
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  // Start 3D animation after presentation ends + buffer
+  const totalPresentationTime = 20000 + 7 * 14000 + 4000;
+  window.addEventListener("load", () => {
+    setTimeout(() => {
+      start3DSequence();
+    }, totalPresentationTime);
+  });
+</script>
+</body>
+</html>
