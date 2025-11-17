@@ -139,7 +139,7 @@
 
   .quote{
     font-size:1.6rem; line-height:1.5; background:rgba(0,0,0,.6);
-    padding:20px; border-left:4px solid var(--accent);
+    padding:20px; border-left:4px solid #e75867;
     border-radius:5px; box-shadow:0 0 20px rgba(0,0,0,0.5);
     margin-bottom:20px; font-style:italic;
   }
@@ -318,6 +318,7 @@
 
   <div class="iframe-wrap">
     <iframe
+      id="scratchFrame"
       src="https://scratch.mit.edu/projects/1241737486/embed"
       allowtransparency="true"
       frameborder="0"
@@ -462,6 +463,14 @@
   let presentationRunning = false;
   let sceneTimer = null;
 
+  function stopScratch() {
+    const frame = document.getElementById("scratchFrame");
+    if (!frame) return;
+    const current = frame.src;
+    frame.src = "";
+    setTimeout(()=>{ frame.src = current; }, 100);
+  }
+
   async function fadeAudio(sound, targetVolume, duration) {
     if (!sound) return;
     return new Promise(resolve => {
@@ -560,6 +569,8 @@
   function beginWithCredits() {
     if (presentationRunning) return;
 
+    stopScratch();
+
     Object.values(sounds).forEach(s=>{
       s.volume=0;
       s.play().then(()=>s.pause()).catch(()=>{});
@@ -596,4 +607,3 @@
 </script>
 </body>
 </html>
-
