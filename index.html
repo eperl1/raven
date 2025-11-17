@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>The Raven – Emotional Presentation Loop</title>
+<style>
+  :root{--accent:#e75867;}
+  html,body{
+    margin:0; height:100%; background:#000; color:#f0f0f0;
+    font-family:'Georgia','Times New Roman',serif; overflow:hidden;
+  }
+  .intro{
+    position:relative; display:flex; flex-direction:column; align-items:center;
+    justify-content:center; height:100%; opacity:1; transition:opacity 1.5s ease-in-out;
+  }
+  h1{
+    margin:0 0 10px; font-size:2.6rem;
+    text-shadow:0 2px 10px #000; user-select:none; text-align:center;
+  }
+  /* INTRO main title styling */
+  .intro h1{
+    color:#ffd56a;
+    text-shadow:
+      3px 3px 4px #000,
+     -3px 3px 4px #000,
+      3px -3px 4px #000,
+     -3px -3px 4px #000;
+  }
+  .intro p{
+    margin:10px 0 22px; color:#aaa; font-size:1.1rem; user-select:none; text-align:center;
+  }
+  .start-now{
+    margin-top:8px; padding:10px 14px;
+    background:#141417; border:1px solid #333; color:#eee; border-radius:8px;
+    cursor:pointer; opacity:.85; font-family:system-ui,sans-serif;
+  }
+  .start-now:hover{opacity:1;}
+
+  .deck{
+    position:fixed; inset:0; display:none; opacity:0; transition:opacity 1s ease-in-out;
+  }
+  .deck.active{display:block; opacity:1;}
+
+  .scene{
+    position:absolute; inset:0; opacity:0; transition:opacity 1s ease-in-out;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; background-size:cover; background-position:center;
+  }
+  .scene.active{opacity:1;}
+
+  #sorrow{background-image:url(/images/sorrow-bg.jpg);}
+  #fear{background-image:url(/images/fearbg.jpg);}
+  #amusement{background-image:url(/images/amusement-bg.jpg);}
+  #irritation{background-image:url(/images/irritationbg.jpg);}
+  #anxiety{background-image:url(/images/anxiety-bg.jpg);}
+  #desperation{background-image:url(/images/desperation-bg.jpg);}
+  #despair{background-image:url(/images/despair-bg.jpg);}
+  #acceptance{background-image:url(/images/acceptance-bg.jpg);}
+
+  .inner{
+    position:relative; max-width:900px; padding:24px; color:#ddd; text-shadow:1px 1px 5px #000;
+  }
+
+  .title{
+    font-size:3.5rem; margin:0 0 20px;
+    color:var(--accent);
+    text-shadow:0 3px 16px #000;
+    font-weight:900;
+  }
+
+  /* Emotion title colors + outlines */
+
+  #sorrow .title{
+    color:#aaf7ff;
+    text-shadow:
+      3px 3px 4px #000,
+     -3px 3px 4px #000,
+      3px -3px 4px #000,
+     -3px -3px 4px #000;
+  }
+  #fear .title{
+    color:#ffe9a6;
+    text-shadow:
+      3px 3px 4px #000,
+     -3px 3px 4px #000,
+      3px -3px 4px #000,
+     -3px -3px 4px #000;
+  }
+  #amusement .title{
+    color:#6b0015;
+    text-shadow:
+      3px 3px 4px #fff,
+     -3px 3px 4px #fff,
+      3px -3px 4px #fff,
+     -3px -3px 4px #fff;
+  }
+  #irritation .title{
+    color:#ffb347;
+    text-shadow:
+      3px 3px 4px #000,
+     -3px 3px 4px #000,
+      3px -3px 4px #000,
+     -3px -3px 4px #000;
+  }
+  #anxiety .title{
+    color:#fff4d9;
+    text-shadow:
+      3px 3px 4px #8a3a24,
+     -3px 3px 4px #8a3a24,
+      3px -3px 4px #8a3a24,
+     -3px -3px 4px #8a3a24;
+  }
+  #desperation .title{
+    color:#8ff7ff;
+    text-shadow:
+      3px 3px 4px #001018,
+     -3px 3px 4px #001018,
+      3px -3px 4px #001018,
+     -3px -3px 4px #001018;
+  }
+  #despair .title{
+    color:#c7e3ff;
+    text-shadow:
+      3px 3px 4px #000,
+     -3px 3px 4px #000,
+      3px -3px 4px #000,
+     -3px -3px 4px #000;
+  }
+  #acceptance .title{
+    color:#ffd56a;
+    text-shadow:
+      3px 3px 4px #2b1a05,
+     -3px 3px 4px #2b1a05,
+      3px -3px 4px #2b1a05,
+     -3px -3px 4px #2b1a05;
+  }
+
+  .quote{
+    font-size:1.6rem; line-height:1.5; background:rgba(0,0,0,.6);
+    padding:20px; border-left:4px solid var(--accent);
+    border-radius:5px; box-shadow:0 0 20px rgba(0,0,0,0.5);
+    margin-bottom:20px; font-style:italic;
+  }
+
+  /* base description: super bold */
+  .explanation{
+    font-size:1.1rem;
+    line-height:1.6;
+    max-width:800px;
+    margin:0 auto 2rem;
+    font-weight:900;
+  }
+
+  /* SORROW – cyan on dark branches */
+  #sorrow .explanation{
+    color:#aaf7ff;
+    text-shadow:
+      2px 2px 3px #000,
+     -2px 2px 3px #000,
+      2px -2px 3px #000,
+     -2px -2px 3px #000;
+  }
+
+  /* FEAR – pale yellow on storm monster */
+  #fear .explanation{
+    color:#ffe9a6;
+    text-shadow:
+      2px 2px 3px #000,
+     -2px 2px 3px #000,
+      2px -2px 3px #000,
+     -2px -2px 3px #000;
+  }
+
+  /* AMUSEMENT – dark red on bright circus */
+  #amusement .explanation{
+    color:#6b0015;
+    text-shadow:
+      2px 2px 2px #fff,
+     -2px 2px 2px #fff,
+      2px -2px 2px #fff,
+     -2px -2px 2px #fff;
+  }
+
+  /* IRRITATION – bright orange on volcano */
+  #irritation .explanation{
+    color:#ffb347;
+    text-shadow:
+      2px 2px 3px #000,
+     -2px 2px 3px #000,
+      2px -2px 3px #000,
+     -2px -2px 3px #000;
+  }
+
+  /* ANXIETY – cream on warm butterflies */
+  #anxiety .explanation{
+    color:#fff4d9;
+    text-shadow:
+      2px 2px 3px #8a3a24,
+     -2px 2px 3px #8a3a24,
+      2px -2px 3px #8a3a24,
+     -2px -2px 3px #8a3a24;
+  }
+
+  /* DESPERATION – teal on trash sea */
+  #desperation .explanation{
+    color:#8ff7ff;
+    text-shadow:
+      2px 2px 3px #001018,
+     -2px 2px 3px #001018,
+      2px -2px 3px #001018,
+     -2px -2px 3px #001018;
+  }
+
+  /* DESPAIR – ice blue on black trees */
+  #despair .explanation{
+    color:#c7e3ff;
+    text-shadow:
+      2px 2px 3px #000,
+     -2px 2px 3px #000,
+      2px -2px 3px #000,
+     -2px -2px 3px #000;
+  }
+
+  /* ACCEPTANCE – gold on treaty room */
+  #acceptance .explanation{
+    color:#ffd56a;
+    text-shadow:
+      2px 2px 3px #2b1a05,
+     -2px 2px 3px #2b1a05,
+      2px -2px 3px #2b1a05,
+     -2px -2px 3px #2b1a05;
+  }
+
+  .fade-to-black{
+    position:fixed; inset:0; background:#000; opacity:0;
+    transition:opacity 3s ease-in-out; z-index:99; pointer-events:none;
+  }
+  .raven-wrap{position:fixed; inset:0; pointer-events:none; z-index:9;}
+  svg.raven{
+    position:absolute; width:220px; height:auto;
+    left:-40vw; top:20vh; opacity:0;
+  }
+  @keyframes fly{
+    0%{transform:translate(-60vw,0) scale(.9) rotate(-6deg);opacity:0;}
+    15%{opacity:1;}
+    50%{transform:translate(0,-8vh) scale(1) rotate(4deg);opacity:1;}
+    100%{transform:translate(70vw,-2vh) scale(.95) rotate(-2deg);opacity:0;}
+  }
+  svg.raven.animate{animation:fly 2.4s ease-in-out forwards;}
+  .nevermore{
+    position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
+    font-size:10rem; font-weight:700; color:var(--accent);
+    text-shadow:0 0 30px #000; opacity:0; z-index:10; pointer-events:none;
+  }
+  @keyframes popFade{
+    0%{opacity:0; transform:scale(.6);}
+    20%{opacity:1; transform:scale(1.06);}
+    80%{opacity:1; transform:scale(1);}
+    100%{opacity:0; transform:scale(1.5);}
+  }
+  .nevermore.show{animation:popFade 2s ease-in-out forwards;}
+  .hide{display:none;}
+
+  /* CREDITS SCENE */
+  .credits{
+    position:fixed; inset:0;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    background:radial-gradient(circle at center, #222 0%, #000 70%);
+    color:#f5f5f5; font-family:system-ui,sans-serif;
+    opacity:0; pointer-events:none; transition:opacity 1s ease-in-out;
+    z-index:50;
+  }
+  .credits.show{
+    opacity:1; pointer-events:auto;
+  }
+  .credits-line{
+    font-size:1.8rem; margin:8px 0;
+  }
+  .credits-title{
+    font-size:2.4rem; margin-bottom:18px; color:var(--accent);
+    text-shadow:0 0 18px #000;
+  }
+
+  /* iframe wrapper for Scratch */
+  .iframe-wrap{
+    flex:0 0 auto;
+    display:flex; align-items:center; justify-content:center;
+    width:100%;
+    margin-top:10px;
+  }
+  .iframe-wrap iframe{
+    width:800px; height:600px;
+    max-width:98vw; max-height:70vh;
+    border:1px solid #222; background:#000;
+  }
+</style>
+
+<body>
+
+<div id="audio-bin" class="hide">
+  <audio id="ambience-sorrow" src="/sounds/sorrow.m4a" loop preload="auto"></audio>
+  <audio id="ambience-fear" src="/sounds/fear.m4a" loop preload="auto"></audio>
+  <audio id="ambience-amusement" src="/sounds/amusement.m4a" loop preload="auto"></audio>
+  <audio id="ambience-irritation" src="/sounds/irritation.m4a" loop preload="auto"></audio>
+  <audio id="ambience-anxiety" src="/sounds/anxiety.m4a" loop preload="auto"></audio>
+  <audio id="ambience-desperation" src="/sounds/desperation.m4a" loop preload="auto"></audio>
+  <audio id="ambience-despair" src="/sounds/despair.m4a" loop preload="auto"></audio>
+  <audio id="ambience-acceptance" src="/sounds/acceptance.m4a" loop preload="auto"></audio>
+  <audio id="sound-knocking" src="/sounds/sound-knocking.m4a" preload="auto"></audio>
+  <audio id="sound-thunder" src="/sounds/sound-thunder.m4a" preload="auto"></audio>
+  <audio id="sound-raven" src="/sounds/sound-raven.m4a" preload="auto"></audio>
+</div>
+
+<div class="intro" id="intro">
+  <h1>The Raven</h1>
+
+  <div class="iframe-wrap">
+    <iframe
+      src="https://scratch.mit.edu/projects/1241737486/embed"
+      allowtransparency="true"
+      frameborder="0"
+      scrolling="no"
+      allowfullscreen
+    ></iframe>
+  </div>
+
+  <p>The presentation will begin when you start it.</p>
+  <button class="start-now" id="startNow">Start Cinematic Experience</button>
+</div>
+
+<div class="credits" id="credits">
+  <div class="credits-title">Credits</div>
+  <div class="credits-line">1. Ethan – Website</div>
+  <div class="credits-line">2. Walter, Kai, and Vincent – Scratch</div>
+  <div class="credits-line">3. Antony – Music</div>
+</div>
+
+<div class="deck" id="deck">
+  <section class="scene" id="sorrow">
+    <div class="inner">
+      <h2 class="title">Sorrow</h2>
+      <div class="quote">"Vainly I had sought to borrow from my books surcease of sorrow—sorrow for the lost Lenore."</div>
+      <p class="explanation">
+        Opening the door to find only darkness, the narrator's brief fear gives way again to his profound grief. The dim, rainy atmosphere reflects his isolation and deep sadness as he fails to find any distraction from the pain of losing Lenore. It relates to thunderstorm in the way that lightning and thunder represent the flashing back memories of Lenore and the clouds represent his depression. The guitar version of "Hurt" by Johnny Cash connects to this sorrow because its slow, painful chords and lyrics about regret and emptiness mirror how the narrator feels broken and hollow inside at the beginning of the poem, grieving the loss of Lenore.
+      </p>
+    </div>
+  </section>
+
+  <section class="scene" id="fear">
+    <div class="inner">
+      <h2 class="title">Fear</h2>
+      <div class="quote">"And the silken, sad, uncertain rustling of each purple curtain thrilled me—filled me with fantastic terrors never felt before;"</div>
+      <p class="explanation">
+        Before the raven appears, a mysterious knock at the door fills the narrator with a sudden, irrational fear. The pulsing heartbeat and view of the closed door reflect his anxiety and suspense, wondering who—or what—could be there at this late hour. It relates to this background because there are clouds in the background with a monster which represents the narrarator's fear of the unknown when someone knocked on his door and he didn't know what. This connects directly to the fear in the poem, because just like the creepy figure hidden in the clouds, the narrator is terrified of something he can’t fully see or understand, which makes his imagination run wild and his fear even stronger. The guitar version of "Tubular Bells" by Mike Oldfield matches this fear because its eerie, repeating notes sound like a horror movie soundtrack, echoing the tense, creepy feeling when he hears the knocking and doesn’t know who—or what—is there.
+      </p>
+    </div>
+  </section>
+
+  <section class="scene" id="amusement">
+    <div class="inner">
+      <h2 class="title">Amusement</h2>
+      <div class="quote">"Then this ebony bird beguiling my sad fancy into smiling, by the grave and stern decorum of the countenance it wore."</div>
+      <p class="explanation">
+        The sudden arrival of the raven offers a strange distraction. The narrator is initially entertained by the bird's serious appearance, which briefly pulls him out of his grief. It relates to a circus because circuses are supposed to entertain but it gives kind of a creepy vibe since they are dressed like clowns just like in the raven. The song "Buddy Holly" by Weezer fits this amusement because it has a fun, upbeat sound that feels light and distracting, just like the way the raven’s odd, serious look makes the narrator smile for a moment and forget his sadness.
+      </p>
+    </div>
+  </section>
+
+  <section class="scene" id="irritation">
+    <div class="inner">
+      <h2 class="title">Irritation</h2>
+      <div class="quote">"What this grim, ungainly, ghastly, gaunt, and ominous bird of yore meant in croaking 'Nevermore'."</div>
+      <p class="explanation">
+        Amusement sours into annoyance as the raven answers every question with the same word. The narrator’s mind begins to race, trying to understand the meaning behind the "ominous" repetition. The tense, jarring visuals and sounds mirror his growing agitation.
+        In the thunderstorm metaphor, the lightning and thunder represent the narrator’s sharp, sudden flashbacks of Lenore, while the heavy clouds symbolize the persistent weight of his depression that hangs over him.
+        In the volcano metaphor, the narrator’s anger toward the loss of Lenore sits hidden like magma deep within; when the raven provokes him, that repressed anger erupts all at once—just as magma bursts forth when a volcano finally explodes. The song "Enter Sandman" by Metallica relates to this irritation because its heavy, pounding riffs and dark tone feel like someone’s thoughts getting louder and more aggressive, just like the narrator getting more and more furious as the raven keeps saying “Nevermore” and he finally snaps and calls it a devil from hell.
+      </p>
+    </div>
+  </section>
+
+  <section class="scene" id="anxiety">
+    <div class="inner">
+      <h2 class="title">Anxiety</h2>
+      <div class="quote">"Then, methought, the air grew denser, perfumed from an unseen censer..."</div>
+      <p class="explanation">
+        As the air seems to grow heavier around him, the narrator’s mind fills with anxious thoughts. He worries that he will never find any relief from his grief and that he will never be able to forget Lenore, no matter how much he longs for peace. This suffocating feeling in the air mirrors how his fear about the future presses down on him and makes it hard to breathe. The idea of “butterflies in the stomach” relates to this anxiety, because those nervous flutters are like a physical sign of how restless and uneasy he feels inside as the raven’s answers make him more and more unsure about his future. The song "Creep" by Radiohead connects to this anxiety because its lyrics about feeling like you don’t belong and its sad, tense build‑up match the way the narrator feels insecure and trapped in his grief, wondering if he’ll ever feel normal or free from his pain again.
+      </p>
+    </div>
+  </section>
+
+  <section class="scene" id="desperation">
+    <div class="lightning"></div>
+    <div class="inner">
+      <h2 class="title">Desperation</h2>
+      <div class="quote">"'Prophet!' said I, 'thing of evil!—prophet still, if bird or devil!—Is there—is there balm in Gilead?—tell me, I implore!'"</div>
+      <p class="explanation">
+        The narrator now sees the raven as a supernatural messenger. He desperately begs it for any sign of hope, asking if he will ever find peace or see Lenore in heaven. The raging thunderstorm reflects his own internal torment and frantic search for answers.
+        The background image of a single hand reaching up from a sea of trash also shows his desperation, because it looks like someone drowning and begging for help while being pulled under by all the “garbage” of their life—just like he feels buried under his grief and grasping for any last chance to be saved. The song "One" by Metallica is related to this desperation because its lyrics about someone trapped in pain and wanting escape—and its intense, building guitar parts—mirror how the narrator feels stuck in emotional torture while he begs the raven to tell him if there is any hope of reuniting with Lenore in heaven.
+      </p>
+    </div>
+  </section>
+
+  <section class="scene" id="despair">
+    <div class="inner">
+      <h2 class="title">Despair</h2>
+      <div class="quote">"Take thy beak from out my heart, and take thy form from off my door!' Quoth the Raven 'Nevermore'."</div>
+      <p class="explanation">
+        When the raven confirms he will never again see Lenore, the narrator shatters. He accepts "Nevermore" as his final doom. This shriek of anguish marks his complete surrender to hopelessness as the last light of hope is extinguished. The song "Something in the Way" by Nirvana fits this despair because its quiet, heavy, almost whispering mood feels like someone who has completely given up, just like the narrator when he realizes Lenore will never again sit in the velvet chair and he will live under a permanent shadow of grief.
+      </p>
+    </div>
+  </section>
+
+  <section class="scene" id="acceptance">
+    <div class="inner">
+      <h2 class="title">Acceptance</h2>
+      <div class="quote">"And my soul from out that shadow that lies floating on the floor shall be lifted—nevermore!"</div>
+      <p class="explanation">
+        The storm has passed, both outside and within. All that remains is the chilling, permanent shadow of the raven, symbolizing the narrator's soul now trapped in eternal despair. He doesn't fight anymore; he has accepted his fate. The song "Knockin' on Heaven's Door" (Guns N' Roses version) relates to this acceptance because its slow, resigned melody and lyrics about standing at the edge of death feel like someone who knows they can’t change what’s coming, just like the narrator quietly accepting that he will never reunite with Lenore in heaven and will carry his grief forever.
+      </p>
+    </div>
+  </section>
+</div>
+
+<div class="raven-wrap" aria-hidden="true">
+  <svg class="raven" id="raven" viewBox="0 0 260 160"><g><path fill="#0a0a0a" d="M120,70 C90,40 70,30 55,25 C85,55 95,85 125,100 Z"/><path fill="#0a0a0a" d="M60,100 C40,80 20,70 10,60 C35,85 45,115 70,130 Z"/><ellipse fill="#0a0a0a" cx="140" cy="110" rx="80" ry="55"/><path fill="#0a0a0a" d="M80,135 L40,160 L85,150 Z"/><circle fill="#0a0a0a" cx="205" cy="85" r="24"/><path fill="#0a0a0a" d="M220,83 L260,75 L220,92 Z"/><circle fill="#c83c3c" cx="212" cy="80" r="3"/></g></svg>
+</div>
+<div class="nevermore" id="nevermore">NEVERMORE</div>
+<div class="fade-to-black" id="fadeToBlack"></div>
+
+<script>
+  const config = {
+    sceneOrder: ["sorrow","fear","amusement","irritation","anxiety","desperation","despair","acceptance"],
+    sceneDurationMs: 14000
+  };
+
+  const dom = {
+    intro: document.getElementById("intro"),
+    deck: document.getElementById("deck"),
+    startBtn: document.getElementById("startNow"),
+    raven: document.getElementById("raven"),
+    nevermore: document.getElementById("nevermore"),
+    fadeToBlack: document.getElementById("fadeToBlack"),
+    credits: document.getElementById("credits"),
+  };
+
+  const sounds = {
+    sorrow: document.getElementById("ambience-sorrow"),
+    fear: document.getElementById("ambience-fear"),
+    amusement: document.getElementById("ambience-amusement"),
+    irritation: document.getElementById("ambience-irritation"),
+    anxiety: document.getElementById("ambience-anxiety"),
+    desperation: document.getElementById("ambience-desperation"),
+    despair: document.getElementById("ambience-despair"),
+    acceptance: document.getElementById("ambience-acceptance"),
+    knocking: document.getElementById("sound-knocking"),
+    thunder: document.getElementById("sound-thunder"),
+    raven: document.getElementById("sound-raven"),
+  };
+
+  let presentationRunning = false;
+  let sceneTimer = null;
+
+  async function fadeAudio(sound, targetVolume, duration) {
+    if (!sound) return;
+    return new Promise(resolve => {
+      const steps = 20;
+      const stepTime = duration / steps;
+      const start = sound.volume;
+      const delta = targetVolume - start;
+      let current = 0;
+      const id = setInterval(()=>{
+        current++;
+        sound.volume = start + delta * (current/steps);
+        if (current >= steps) {
+          clearInterval(id);
+          if (targetVolume === 0) {
+            sound.pause();
+            sound.currentTime = 0;
+          }
+          resolve();
+        }
+      }, stepTime);
+    });
+  }
+
+  async function playSound(sound, volume=0.7) {
+    if (!sound) return;
+    try {
+      sound.volume = 0;
+      await sound.play();
+      await fadeAudio(sound, volume, 1500);
+    } catch(e) {}
+  }
+
+  async function stopAllSounds(except=null) {
+    const tasks = [];
+    for (const key in sounds) {
+      const s = sounds[key];
+      if (s && s !== except) tasks.push(fadeAudio(s,0,1000));
+    }
+    await Promise.all(tasks);
+  }
+
+  function cueNevermore() {
+    dom.raven.classList.remove("animate"); void dom.raven.offsetWidth;
+    dom.raven.style.top = (15 + Math.random()*40) + "vh";
+    dom.raven.classList.add("animate");
+    sounds.raven.currentTime = 0; sounds.raven.play().catch(()=>{});
+    dom.nevermore.classList.remove("show"); void dom.nevermore.offsetWidth;
+    dom.nevermore.classList.add("show");
+  }
+
+  async function showScene(sceneId) {
+    document.querySelectorAll(".scene").forEach(s=>s.classList.remove("active"));
+    const sceneEl = document.getElementById(sceneId);
+    if (!sceneEl) return;
+    sceneEl.classList.add("active");
+
+    await stopAllSounds(sounds[sceneId]);
+    await playSound(sounds[sceneId]);
+
+    switch(sceneId){
+      case "fear":
+        setTimeout(()=>{sounds.knocking.currentTime=0; sounds.knocking.play().catch(()=>{});},1000);
+        setTimeout(()=>{sounds.knocking.currentTime=0; sounds.knocking.play().catch(()=>{});},3500);
+        break;
+      case "irritation":
+        setTimeout(cueNevermore,4000);
+        break;
+      case "desperation":
+        setTimeout(()=>{sounds.thunder.currentTime=0; sounds.thunder.play().catch(()=>{});},1500);
+        setTimeout(cueNevermore,6000);
+        break;
+      case "despair":
+        setTimeout(cueNevermore,5000);
+        break;
+      case "acceptance":
+        setTimeout(cueNevermore,6000);
+        break;
+    }
+  }
+
+  function runDeck() {
+    if (presentationRunning) return;
+    presentationRunning = true;
+    dom.deck.classList.add("active");
+
+    let index = 0;
+    showScene(config.sceneOrder[index]);
+
+    sceneTimer = setInterval(()=>{
+      index++;
+      if (index >= config.sceneOrder.length) index = 0;
+      showScene(config.sceneOrder[index]);
+    }, config.sceneDurationMs);
+  }
+
+  function beginWithCredits() {
+    if (presentationRunning) return;
+
+    Object.values(sounds).forEach(s=>{
+      s.volume=0;
+      s.play().then(()=>s.pause()).catch(()=>{});
+    });
+
+    setTimeout(()=>{
+      Object.values(sounds).forEach(s=>{s.pause(); s.volume=1;});
+    },100);
+
+    dom.intro.style.opacity="0";
+    setTimeout(()=>{
+      dom.intro.classList.add("hide");
+      dom.credits.classList.add("show");
+      setTimeout(()=>{
+        dom.credits.classList.remove("show");
+        runDeck();
+      },9000);
+    },1600);
+  }
+
+  document.addEventListener("DOMContentLoaded",()=>{
+    dom.startBtn.addEventListener("click",()=>{
+      beginWithCredits();
+    });
+
+    // one-time audio unlock on first click anywhere
+    document.body.addEventListener("click",()=>{
+      Object.values(sounds).forEach(s=>{
+        s.volume=0;
+        s.play().then(()=>s.pause()).catch(()=>{});
+      });
+    },{once:true});
+  });
+</script>
+</body>
+</html>
