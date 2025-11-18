@@ -51,7 +51,7 @@
   #sorrow{background-image:url(/images/sorrow-bg.jpg);}
   #fear{background-image:url(/images/fearbg.jpg);}
   #amusement{background-image:url(/images/amusement-bg.jpg);}
-  #irritation{background-image:url(/images/irritationbg.jpg);}
+  #rage{background-image:url(/images/irritationbg.jpg);} /* Keeping old background for rage */
   #anxiety{background-image:url(/images/anxiety-bg.jpg);}
   #desperation{background-image:url(/images/desperation-bg.jpg);}
   #despair{background-image:url(/images/despair-bg.jpg);}
@@ -69,7 +69,6 @@
   }
 
   /* Emotion title colors + outlines */
-
   #sorrow .title{
     color:#aaf7ff;
     text-shadow:
@@ -94,7 +93,7 @@
       3px -3px 4px #fff,
      -3px -3px 4px #fff;
   }
-  #irritation .title{
+  #rage .title{
     color:#ffb347;
     text-shadow:
       3px 3px 4px #000,
@@ -151,7 +150,7 @@
     font-weight:900;
   }
 
-  /* SORROW – cyan on dark branches */
+  /* Descriptions text colors + outlines */
   #sorrow .explanation{
     color:#aaf7ff;
     text-shadow:
@@ -160,8 +159,6 @@
       2px -2px 3px #000,
      -2px -2px 3px #000;
   }
-
-  /* FEAR – pale yellow on storm monster */
   #fear .explanation{
     color:#ffe9a6;
     text-shadow:
@@ -170,8 +167,6 @@
       2px -2px 3px #000,
      -2px -2px 3px #000;
   }
-
-  /* AMUSEMENT – dark red on bright circus */
   #amusement .explanation{
     color:#6b0015;
     text-shadow:
@@ -180,9 +175,7 @@
       2px -2px 2px #fff,
      -2px -2px 2px #fff;
   }
-
-  /* IRRITATION – bright orange on volcano */
-  #irritation .explanation{
+  #rage .explanation{
     color:#ffb347;
     text-shadow:
       2px 2px 3px #000,
@@ -190,8 +183,6 @@
       2px -2px 3px #000,
      -2px -2px 3px #000;
   }
-
-  /* ANXIETY – cream on warm butterflies */
   #anxiety .explanation{
     color:#fff4d9;
     text-shadow:
@@ -200,8 +191,6 @@
       2px -2px 3px #8a3a24,
      -2px -2px 3px #8a3a24;
   }
-
-  /* DESPERATION – teal on trash sea */
   #desperation .explanation{
     color:#8ff7ff;
     text-shadow:
@@ -210,8 +199,6 @@
       2px -2px 3px #001018,
      -2px -2px 3px #001018;
   }
-
-  /* DESPAIR – ice blue on black trees */
   #despair .explanation{
     color:#c7e3ff;
     text-shadow:
@@ -220,8 +207,6 @@
       2px -2px 3px #000,
      -2px -2px 3px #000;
   }
-
-  /* ACCEPTANCE – dark text with light outline to stay readable */
   #acceptance .explanation{
     color:#23110a;
     text-shadow:
@@ -332,8 +317,8 @@
 <div class="credits" id="credits">
   <div class="credits-title">Credits</div>
   <div class="credits-line">1. Ethan – Website</div>
-  <div class="credits-line">2. Walter, Kai, and Vincent – Scratch &amp; Images for Website</div>
-  <div class="credits-line">3. Antoni – Music</div>
+  <div class="credits-line">2. Walter, Kai, and Vincent – Helped with Website &amp; Scratch</div>
+  <div class="credits-line">3. Antony – Music</div>
 </div>
 
 <div class="deck" id="deck">
@@ -367,12 +352,12 @@
     </div>
   </section>
 
-  <section class="scene" id="irritation">
+  <section class="scene" id="rage">
     <div class="inner">
-      <h2 class="title">RAGE</h2>
+      <h2 class="title">Rage</h2>
       <div class="quote">"What this grim, ungainly, ghastly, gaunt, and ominous bird of yore meant in croaking 'Nevermore'."</div>
       <p class="explanation">
-        The narrator’s amusement soon sours to frustration, as the raven’s single word “Nevermore” rings relentless. His mind races with rage, struggling to undetstand what's happening. Lightning flashes of painful memory strike, and beneath the surface, simmering volcanic anger threatens eruption. Metallica’s “Enter Sandman,” with its heavy riffs, matches that brewing tempest.
+        The narrator’s amusement soon sours to frustration, as the raven’s single word “Nevermore” rings relentless. His mind races with growing irritability, struggling to decipher the ominous refrain. Lightning flashes of painful memory strike, and beneath the surface, simmering volcanic anger threatens eruption. Metallica’s “Enter Sandman,” with its heavy riffs, matches that brewing tempest.
       </p>
     </div>
   </section>
@@ -427,7 +412,7 @@
 
 <script>
   const config = {
-    sceneOrder: ["sorrow","fear","amusement","irritation","anxiety","desperation","despair","acceptance"],
+    sceneOrder: ["sorrow","fear","amusement","rage","anxiety","desperation","despair","acceptance"],
     sceneDurationMs: 14000
   };
 
@@ -445,7 +430,7 @@
     sorrow: document.getElementById("ambience-sorrow"),
     fear: document.getElementById("ambience-fear"),
     amusement: document.getElementById("ambience-amusement"),
-    irritation: document.getElementById("ambience-irritation"),
+    rage: document.getElementById("ambience-irritation"),
     anxiety: document.getElementById("ambience-anxiety"),
     desperation: document.getElementById("ambience-desperation"),
     despair: document.getElementById("ambience-despair"),
@@ -541,7 +526,7 @@
           sounds.knocking.play().catch(() => {});
         }, 3500);
         break;
-      case "irritation":
+      case "rage":
         setTimeout(cueNevermore, 4000);
         break;
       case "desperation":
@@ -623,7 +608,3 @@
 </script>
 </body>
 </html>
-
-
-
-
